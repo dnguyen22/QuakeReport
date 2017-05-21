@@ -9,6 +9,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.text.DecimalFormat;
 
 
 import java.util.List;
@@ -59,8 +60,11 @@ public class EarthquakeAdapter extends ArrayAdapter<Earthquake> {
         // Find the TextView in the list_item.xml layout with the ID version_name
         TextView magnitudeTextView = (TextView) listItemView.findViewById(R.id.magnitude);
         // Get the magnitude from the current Earthquake object and
-        // set this text on the name TextView
-        magnitudeTextView.setText(currentEarthquake.getMagnitude());
+        // format the magnitude to one decimal place
+        DecimalFormat formatter = new DecimalFormat("0.0");
+        String formattedMagnitude = formatter.format(currentEarthquake.getMagnitude());
+        // Set this text on the magnitude TextView
+        magnitudeTextView.setText(formattedMagnitude);
 
         String fullLocation = currentEarthquake.getPlace();
         String primaryLocation;
@@ -78,13 +82,13 @@ public class EarthquakeAdapter extends ArrayAdapter<Earthquake> {
         // Find the TextView in the list_item.xml layout with the ID version_number
         TextView offsetLocationTextView = (TextView) listItemView.findViewById(R.id.offset_location);
         // Get the offset location name from the current Earthquake object and
-        // set this text on the number TextView
+        // set this text on the offset location TextView
         offsetLocationTextView.setText(locationOffset);
 
         // Find the TextView in the list_item.xml layout with the ID version_number
         TextView primaryLocationTextView = (TextView) listItemView.findViewById(R.id.primary_location);
         // Get the primary location name from the current Earthquake object and
-        // set this text on the number TextView
+        // set this text on the primary location TextView
         primaryLocationTextView.setText(primaryLocation);
 
         // Create a new Date object from the time in milliseconds of the earthquake
