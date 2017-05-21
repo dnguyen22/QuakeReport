@@ -2,6 +2,7 @@ package com.example.android.quakereport;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +11,7 @@ import android.widget.TextView;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.text.DecimalFormat;
+import android.graphics.drawable.GradientDrawable;
 
 
 import java.util.List;
@@ -61,10 +63,19 @@ public class EarthquakeAdapter extends ArrayAdapter<Earthquake> {
         TextView magnitudeTextView = (TextView) listItemView.findViewById(R.id.magnitude);
         // Get the magnitude from the current Earthquake object and
         // format the magnitude to one decimal place
-        DecimalFormat formatter = new DecimalFormat("0.0");
-        String formattedMagnitude = formatter.format(currentEarthquake.getMagnitude());
+        String formattedMagnitude = formatMagnitude(currentEarthquake.getMagnitude());
         // Set this text on the magnitude TextView
         magnitudeTextView.setText(formattedMagnitude);
+
+        // Set the proper background color on the magnitude circle.
+        // Fetch the background from the TextView, which is a GradientDrawable.
+        GradientDrawable magnitudeCircle = (GradientDrawable) magnitudeTextView.getBackground();
+
+        // Get the appropriate background color based on the current earthquake magnitude
+        int magnitudeColor = getMagnitudeColor(currentEarthquake.getMagnitude());
+
+        // Set the color on the magnitude circle
+        magnitudeCircle.setColor(magnitudeColor);
 
         String fullLocation = currentEarthquake.getPlace();
         String primaryLocation;
@@ -130,5 +141,45 @@ public class EarthquakeAdapter extends ArrayAdapter<Earthquake> {
     private String formatTime(Date dateObject) {
         SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a");
         return timeFormat.format(dateObject);
+    }
+
+    /**
+     * Return the formatted magnitude string showing 1 decimal place (i.e. "3.2")
+     * from a decimal magnitude value.
+     */
+    private String formatMagnitude(double magnitude) {
+        DecimalFormat magnitudeFormat = new DecimalFormat("0.0");
+        return magnitudeFormat.format(magnitude);
+    }
+
+    /**
+     * Return the magnitude circle background color ID based off the magnitude.
+     */
+    private int getMagnitudeColor(double magnitude) {
+        int magFloor = (int) Math.floor(magnitude);
+        switch (magFloor) {
+            case 0:
+            case 1:
+                return ContextCompat.getColor(getContext(), R.color.magnitude1);
+            case 2:
+                return ContextCompat.getColor(getContext(), R.color.magnitude2);
+            case 3:
+                return ContextCompat.getColor(getContext(), R.color.magnitude3);
+            case 4:
+                return ContextCompat.getColor(getContext(), R.color.magnitude4);
+            case 5:
+                return ContextCompat.getColor(getContext(), R.color.magnitude5);
+            case 6:
+                return ContextCompat.getColor(getContext(), R.color.magnitude6);
+            case 7:
+                return ContextCompat.getColor(getContext(), R.color.magnitude7);
+            case 8:
+                return ContextCompat.getColor(getContext(), R.color.magnitude8);
+            case 9:
+                return ContextCompat.getColor(getContext(), R.color.magnitude9);
+            default:
+                return ContextCompat.getColor(getContext(), R.color.magnitude10plus);
+        }
+
     }
 }
