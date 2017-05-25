@@ -17,27 +17,35 @@ package com.example.android.quakereport;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import java.util.ArrayList;
 
 public class EarthquakeActivity extends AppCompatActivity {
 
-    public static final String LOG_TAG = EarthquakeActivity.class.getName();
+    /** URL for earthquake dat from the USGS dataset */
+    private static final String USGS_REQUEST_URL =
+            "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&eventtype=earthquake&orderby=time&minmag=6&limit=10";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.earthquake_activity);
 
-        // Create a fake list of earthquakes.
-        ArrayList<Earthquake> earthquakes = QueryUtils.extractEarthquakes();
+        // Kick off an {@link AsyncTask} to perform the network request
+        EarthquakeAsyncTask task = new EarthquakeAsyncTask();
+        task.execute(USGS_REQUEST_URL);
+    }
 
+    /**
+     * Update the UI with the given earthquake information.
+     */
+    private void updateUi(ArrayList<Earthquake> earthquakes) {
         // Find a reference to the {@link ListView} in the layout
         ListView earthquakeListView = (ListView) findViewById(R.id.list);
 
@@ -63,5 +71,42 @@ public class EarthquakeActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+    }
+
+    /**
+     * {@link AsyncTask} to perform the network request on a background thread, and then
+     * update the UI with the first earthquake in the response.
+     */
+    private class EarthquakeAsyncTask extends AsyncTask<String, Void, ArrayList<Earthquake>> {
+        @Override
+        protected ArrayList<Earthquake> doInBackground(String... urls) {
+            // Don't perform the request if there are no URLs, or the first URL is null.
+            if (urls.length < 1 || urls[0] == null) {
+                return null;
+            }
+
+            // Perform the HTTP request for earthquake data and process the response.
+            return QueryUtils.fetchEarthquakeData(urls[0]);
+        }
+
+        /**
+         * Update the screen with the given earthquake (which was the result of the
+         * {@link EarthquakeAsyncTask}).
+         * This method is invoked on the main UI thread after the background work has been
+         * completed.
+         *
+         * It IS okay to modify the UI within this method. We take the {@link ArrayList<Earthquake>} object
+         * (which was returned from the doInBackground() method) and update the views on the screen.
+         */
+        @Override
+        protected void onPostExecute(ArrayList<Earthquake> earthquakes) {
+            // If there is no result, do nothing
+            if (earthquakes == null) {
+                return;
+            }
+
+            // Update the information displayed to the user.
+            updateUi(earthquakes);
+        }
     }
 }
