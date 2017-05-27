@@ -17,6 +17,7 @@
     <string name="app_name">Quake Report</string>
 
     <string name="empty_state">No earthquakes found.</string>
+    <string name="no_network_connection">No internet connection.</string>
 
     <!-- Default text to show with the earthquake location ("Near the Pacific-Antarctic Ridge")
  if no specific kilometer distance from the primary location is given [CHAR LIMIT=30] -->
